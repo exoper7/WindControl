@@ -197,6 +197,7 @@ void loop() {
 
   V0.process(control.K2, control.K3);
   control.process(V0.U,T1.avgTemp,T2.avgTemp);
+  delay(1);
   
 
   //trigger every 500ms
