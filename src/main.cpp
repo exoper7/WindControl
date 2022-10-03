@@ -4,6 +4,8 @@
 #include <TempSensor.h>
 #include <voltage.h>
 #include <kControl.h>
+#include <RPMs.h>
+
 
 //ModbusIP object
 ModbusIP mb;
@@ -16,6 +18,8 @@ ModbusIP mb;
 #define mr_T2 20
 #define mr_uptime 22
 
+#define RPMpin 15
+
 WiFiServer server(80);
 
 // Set your Static IP address
@@ -26,12 +30,6 @@ IPAddress primaryDNS(1, 1, 1, 1);
 
 //JSON file for API
 DynamicJsonDocument _resp(512);
-
-//real data
-float _voltage = 22.33;
-float rpm = 123.45;
-float power = 0.231;
-float current = 1.332;
 
 uint loop_n = 0;
 bool K1, K2, K3;
@@ -46,9 +44,17 @@ voltage V0;
 //instance for relay controls
 kControl control;
 
+//instance for RPM reading
+RPMs _rpm;
+
+void RPMcallback(void){
+  _rpm.processRPM();
+}
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(RPMpin,INPUT);
 
   for(uint8_t i;i<10;i++){
     digitalWrite(LED_BUILTIN, HIGH);
@@ -80,6 +86,8 @@ void setup() {
   T2.adcPin = A1;
   V0.adcPin = A2;
 
+  attachInterrupt(RPMpin,RPMcallback,RISING);
+
 }
 
 //Splits float value to 2 modbus registers
@@ -100,7 +108,8 @@ void HregFloat(uint16_t _reg, float _val){
 //Update JSON file with data
 void preperData(void){
   _resp["voltage"] = V0.U;
-  _resp["rpm"] = rpm;
+  _resp["speed"]["rpm"] = _rpm.RPM;
+  _resp["speed"]["f"] = _rpm.Hz;
   _resp["power"] = V0.P;
   _resp["currnet"] = V0.I;
   _resp["T1"]["T"] = T1.avgTemp;
@@ -190,7 +199,7 @@ void loop() {
   processGetRequest();
   HregFloat(mr_voltage,V0.U);
   HregFloat(mr_current,V0.I);
-  HregFloat(mr_rpm,rpm);
+  HregFloat(mr_rpm,_rpm.RPM);
   HregFloat(mr_power,V0.P);
   HregFloat(mr_uptime,millis()/1000.000);
   delay(10);
@@ -205,6 +214,7 @@ void loop() {
     loop_n = 0;
     HregFloat(mr_T1,T1.GetAvgTemp());
     HregFloat(mr_T2,T2.GetAvgTemp());
+    _rpm.update();
   }else{
     loop_n++;
   }
