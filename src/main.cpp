@@ -6,6 +6,8 @@
 #include <kControl.h>
 #include <RPMs.h>
 
+//#define APIdebug true
+
 
 //ModbusIP object
 ModbusIP mb;
@@ -32,7 +34,6 @@ IPAddress primaryDNS(1, 1, 1, 1);
 DynamicJsonDocument _resp(512);
 
 uint loop_n = 0;
-bool K1, K2, K3;
 
 //instances for Temperature sensors
 tempSensor T1;
@@ -47,6 +48,7 @@ kControl control;
 //instance for RPM reading
 RPMs _rpm;
 
+//RPM mesurment callback
 void RPMcallback(void){
   _rpm.processRPM();
 }
@@ -116,6 +118,7 @@ void preperData(void){
   _resp["T2"]["T"] = T2.avgTemp;
   _resp["T1"]["R"] = T1.Resistance;
   _resp["T2"]["R"] = T2.Resistance;
+  _resp["fanPower"] = 66.6;
   _resp["uptime"] = millis()/1000.000;
   _resp["K1"] = control.K1;
   _resp["K2"] = control.K2;
@@ -131,7 +134,10 @@ void processGetRequest(void){
 
   if (client)
   {
-    Serial.println(("\n\n##################################\nNew client"));
+
+    #ifdef APIdebug
+      Serial.println(("\n\n##################################\nNew client"));
+    #endif
     // an http request ends with a blank line
     bool currentLineIsBlank = true;
     String _GetRequest = "";
@@ -142,16 +148,23 @@ void processGetRequest(void){
       {
         char c = client.read();
         _GetRequest = _GetRequest +c;
-        Serial.write(c);
+
+        #ifdef APIdebug
+          Serial.write(c);
+        #endif
+        
         // if you've gotten to the end of the line (received a newline
         // character) and the line is blank, the http request has ended,
         // so you can send a reply
         if (c == '\n' && currentLineIsBlank)
         {
           _GetRequest = _GetRequest.substring(4,_GetRequest.indexOf(" HTTP/1.1"));
-          Serial.println((_GetRequest));
-          Serial.println(("Sending response"));
 
+          #ifdef APIdebug
+            Serial.println((_GetRequest));
+            Serial.println(("Sending response"));
+          #endif
+          
           client.print(
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: json\r\n"
@@ -187,7 +200,10 @@ void processGetRequest(void){
 
     // close the connection:
     client.stop();
-    Serial.println(F("Client disconnected"));
+
+    #ifdef APIdebug
+     Serial.println(F("Client disconnected"));
+    #endif
   }
 }
 
@@ -196,7 +212,11 @@ void processGetRequest(void){
 void loop() {
   //Call once inside loop() - all magic here
   mb.task();
+
+  //API handler
   processGetRequest();
+
+  //modbus values here
   HregFloat(mr_voltage,V0.U);
   HregFloat(mr_current,V0.I);
   HregFloat(mr_rpm,_rpm.RPM);
@@ -204,16 +224,22 @@ void loop() {
   HregFloat(mr_uptime,millis()/1000.000);
   delay(10);
 
+  //mesure voltage 
   V0.process(control.K2, control.K3);
+
+  //relays
   control.process(V0.U,T1.avgTemp,T2.avgTemp);
   //delay(1);
   
-
   //trigger every 500ms
   if(loop_n>50){
     loop_n = 0;
+
+    //get temperature readings
     HregFloat(mr_T1,T1.GetAvgTemp());
     HregFloat(mr_T2,T2.GetAvgTemp());
+
+    // zero rpm handler
     _rpm.update();
   }else{
     loop_n++;

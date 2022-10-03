@@ -9,6 +9,7 @@ class RPMs{
         float Hz = 0;
         uint8_t poles = 1; 
 
+        //Callback for rpm pin
         void processRPM(void){
             uint64_t timeNow = time_us_64();
             period = timeNow - lastTime;
@@ -17,6 +18,7 @@ class RPMs{
             RPM = Hz*60.0/poles;
         }
 
+        //checks for 0 rpm 
         void update(void){
             uint64_t timeout = (60000000/poles) + lastTime;
             if (time_us_64() > timeout){
