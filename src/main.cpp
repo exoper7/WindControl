@@ -21,6 +21,10 @@ ModbusIP mb;
 #define mr_uptime 22
 
 #define RPMpin 15
+#define K1pin 4
+#define K2pin 3
+#define K3pin 2
+
 
 WiFiServer server(80);
 
@@ -57,6 +61,9 @@ void RPMcallback(void){
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(RPMpin,INPUT);
+  pinMode(K1pin,OUTPUT_12MA);
+  pinMode(K2pin,OUTPUT_12MA);
+  pinMode(K3pin,OUTPUT_12MA);
 
   for(uint8_t i;i<10;i++){
     digitalWrite(LED_BUILTIN, HIGH);
@@ -84,9 +91,9 @@ void setup() {
   //start API server
   server.begin();
 
-  T1.adcPin = A0;
+  T1.adcPin = A2;
   T2.adcPin = A1;
-  V0.adcPin = A2;
+  V0.adcPin = A0;
 
   attachInterrupt(RPMpin,RPMcallback,RISING);
 
@@ -230,6 +237,9 @@ void loop() {
   //relays
   control.process(V0.U,T1.avgTemp,T2.avgTemp);
   //delay(1);
+  digitalWrite(K1pin,control.K1);
+  digitalWrite(K2pin,control.K2);
+  digitalWrite(K3pin,control.K3);
   
   //trigger every 500ms
   if(loop_n>50){
