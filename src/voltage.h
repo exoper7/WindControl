@@ -14,7 +14,7 @@ class voltage{
         float Vdd = 3.300;
         float adcMax = 4096.00;
         float Ro = 10000.0;
-        float Rt = 400000.0;
+        float Rt = 300000.0;
         float R1 = 10.0;
         float R2 = 10.0;
 
@@ -38,7 +38,7 @@ class voltage{
                     R=1.0/((1.0/R1)+(1.0/R2));
                 }
             }
-            I = U /R;
+            I = U / R;
             P = U * I;
         }
 };

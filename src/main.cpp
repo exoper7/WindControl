@@ -24,12 +24,14 @@ ModbusIP mb;
 #define K1pin 4
 #define K2pin 3
 #define K3pin 2
+#define AlarmLED 7
+#define D8_LED 6
 
 
 WiFiServer server(80);
 
 // Set your Static IP address
-IPAddress local_IP(10, 8, 0, 220);
+IPAddress local_IP(10, 8, 0, 221);
 IPAddress gateway(10, 8, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(1, 1, 1, 1);
@@ -64,6 +66,10 @@ void setup() {
   pinMode(K1pin,OUTPUT_12MA);
   pinMode(K2pin,OUTPUT_12MA);
   pinMode(K3pin,OUTPUT_12MA);
+  pinMode(AlarmLED,OUTPUT_12MA);
+  pinMode(D8_LED,OUTPUT_12MA);
+
+  digitalWrite(AlarmLED,HIGH);
 
   for(uint8_t i;i<10;i++){
     digitalWrite(LED_BUILTIN, HIGH);
@@ -81,7 +87,7 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(150);
   }
-  digitalWrite(LED_BUILTIN, HIGH);
+  
   Serial.println(WiFi.localIP());
   
   //Config Modbus IP
@@ -91,12 +97,18 @@ void setup() {
   //start API server
   server.begin();
 
+  //Assign adc pins
   T1.adcPin = A2;
   T2.adcPin = A1;
   V0.adcPin = A0;
 
+  //Attach interrupt for rpm mesurment
   attachInterrupt(RPMpin,RPMcallback,RISING);
 
+  //some LED's
+  digitalWrite(AlarmLED, LOW);
+  digitalWrite(LED_BUILTIN, HIGH);
+  //digitalWrite(D8_LED, HIGH);
 }
 
 //Splits float value to 2 modbus registers
@@ -121,15 +133,15 @@ void preperData(void){
   _resp["speed"]["f"] = _rpm.Hz;
   _resp["power"] = V0.P;
   _resp["currnet"] = V0.I;
-  _resp["T1"]["T"] = T1.avgTemp;
-  _resp["T2"]["T"] = T2.avgTemp;
-  _resp["T1"]["R"] = T1.Resistance;
-  _resp["T2"]["R"] = T2.Resistance;
+  _resp["temps"]["T1"]["T"] = T1.avgTemp;
+  _resp["temps"]["T2"]["T"] = T2.avgTemp;
+  _resp["temps"]["T1"]["R"] = T1.Resistance;
+  _resp["temps"]["T2"]["R"] = T2.Resistance;
   _resp["fanPower"] = 66.6;
   _resp["uptime"] = millis()/1000.000;
-  _resp["K1"] = control.K1;
-  _resp["K2"] = control.K2;
-  _resp["K3"] = control.K3;
+  _resp["relay"]["K1"] = control.K1;
+  _resp["relay"]["K2"] = control.K2;
+  _resp["relay"]["K3"] = control.K3;
   _resp["timeFromLastChange"] = control.millisFromLastChange / 1000.00;
   _resp["alarm"] = control.Alarm;
   _resp["alarmCode"] = control.AlarmCode;
@@ -240,6 +252,7 @@ void loop() {
   digitalWrite(K1pin,control.K1);
   digitalWrite(K2pin,control.K2);
   digitalWrite(K3pin,control.K3);
+  digitalWrite(AlarmLED,control.Alarm);
   
   //trigger every 500ms
   if(loop_n>50){
