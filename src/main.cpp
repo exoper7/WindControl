@@ -1,10 +1,13 @@
 #include <WiFi.h>
 #include <ModbusIP_ESP8266.h>
 #include <ArduinoJson.h>
+
+
 #include <TempSensor.h>
 #include <voltage.h>
 #include <kControl.h>
 #include <RPMs.h>
+#include <fanControl.h>
 
 //#define APIdebug true
 
@@ -26,6 +29,7 @@ ModbusIP mb;
 #define K3pin 2
 #define AlarmLED 7
 #define D8_LED 6
+#define FanPin 1
 
 
 WiFiServer server(80);
@@ -44,6 +48,7 @@ uint loop_n = 0;
 //instances for Temperature sensors
 tempSensor T1;
 tempSensor T2;
+float MCUtemp;
 
 //instance for Voltage mesurment
 voltage V0;
@@ -58,6 +63,8 @@ RPMs _rpm;
 void RPMcallback(void){
   _rpm.processRPM();
 }
+
+fanControl fan;
 
 
 void setup() {
@@ -105,6 +112,9 @@ void setup() {
   //Attach interrupt for rpm mesurment
   attachInterrupt(RPMpin,RPMcallback,RISING);
 
+  //set pwm for fan
+  analogWriteFreq(23000);
+
   //some LED's
   digitalWrite(AlarmLED, LOW);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -137,7 +147,8 @@ void preperData(void){
   _resp["temps"]["T2"]["T"] = T2.avgTemp;
   _resp["temps"]["T1"]["R"] = T1.Resistance;
   _resp["temps"]["T2"]["R"] = T2.Resistance;
-  _resp["fanPower"] = 66.6;
+  _resp["temps"]["MCU"] = MCUtemp;
+  _resp["fanPower"] = fan.Speed;
   _resp["uptime"] = millis()/1000.000;
   _resp["relay"]["K1"] = control.K1;
   _resp["relay"]["K2"] = control.K2;
@@ -261,11 +272,17 @@ void loop() {
     //get temperature readings
     HregFloat(mr_T1,T1.GetAvgTemp());
     HregFloat(mr_T2,T2.GetAvgTemp());
+    MCUtemp = analogReadTemp();
+
+    fan.Speeede(T1.avgTemp,T2.avgTemp);
+    analogWrite(FanPin,fan.Speed);
 
     // zero rpm handler
     _rpm.update();
   }else{
     loop_n++;
   }
+
+  //analogWriteResolution()
   
 }
