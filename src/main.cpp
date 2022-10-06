@@ -11,6 +11,8 @@
 
 //#define APIdebug true
 
+#define MasterNode
+
 
 //ModbusIP object
 ModbusIP mb;
@@ -35,7 +37,12 @@ ModbusIP mb;
 WiFiServer server(80);
 
 // Set your Static IP address
-IPAddress local_IP(10, 8, 0, 221);
+
+#ifdef MasterNode
+  IPAddress local_IP(10, 8, 0, 220);
+#else
+  IPAddress local_IP(10, 8, 0, 221);
+#endif
 IPAddress gateway(10, 8, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(1, 1, 1, 1);
@@ -113,7 +120,7 @@ void setup() {
   attachInterrupt(RPMpin,RPMcallback,RISING);
 
   //set pwm for fan
-  analogWriteFreq(23000);
+  analogWriteFreq(50000);
 
   //some LED's
   digitalWrite(AlarmLED, LOW);
@@ -134,6 +141,12 @@ void HregFloat(uint16_t _reg, float _val){
   mb.Hreg(_reg,v.asInt[0]);
   mb.Hreg(_reg+1,v.asInt[1]);
 
+}
+
+String SetFanSpeed(String _strData){
+  String _strSpeed = _strData.substring(8);
+  fan.Speed = _strSpeed.toInt();
+  return (String)fan.Speed;
 }
 
 //Update JSON file with data
@@ -206,6 +219,9 @@ void processGetRequest(void){
           }else if(_GetRequest.equals("/status")){ 
             preperData();
             serializeJson(_resp,client);
+          }else if(_GetRequest.startsWith("/setFan/")){ 
+            client.println(_GetRequest.substring(8));
+            client.print(SetFanSpeed(_GetRequest));
           }else{
             client.print("Bad Request\r\n");
           }
@@ -274,15 +290,13 @@ void loop() {
     HregFloat(mr_T2,T2.GetAvgTemp());
     MCUtemp = analogReadTemp();
 
-    fan.Speeede(T1.avgTemp,T2.avgTemp);
-    analogWrite(FanPin,fan.Speed);
+    //fan.Speeede(T1.avgTemp,T2.avgTemp);
+    analogWrite(FanPin,fan.getPwmSpeed());
 
     // zero rpm handler
     _rpm.update();
   }else{
     loop_n++;
   }
-
-  //analogWriteResolution()
   
 }
