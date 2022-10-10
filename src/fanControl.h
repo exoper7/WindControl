@@ -19,13 +19,21 @@ class fanControl{
                 if(TempMax < 45){
                     Speed = 0;
                 }else{
-                    Speed = 30 + (TempMax - 45);
+                    Speed = 20 + (TempMax - 45);
                 }
             }else{
                 if(TempMax > 55){
-                    Speed = 30 + (TempMax - 45);
+                    Speed = 20 + (TempMax - 45);
                 }
             }
+            
+        }
+
+        int getPwmSpeed(){
+            if (Speed > 100.00){
+                Speed = 100;
+            }
+            return Speed * 2.55;
         }
 
 };
