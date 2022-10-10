@@ -26,6 +26,9 @@ class fanControl{
                     Speed = 20 + (TempMax - 45);
                 }
             }
+            if (Speed > 100.00){
+                Speed = 100;
+            }
             
         }
 

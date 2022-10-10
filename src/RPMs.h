@@ -24,6 +24,7 @@ class RPMs{
             if (time_us_64() > timeout){
                 RPM = 0;
                 period = 0;
+                Hz = 0;
             }
         }
 
