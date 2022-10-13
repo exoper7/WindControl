@@ -13,9 +13,11 @@ class RPMs{
         void processRPM(void){
             uint64_t timeNow = time_us_64();
             period = timeNow - lastTime;
-            lastTime = timeNow;
-            Hz = 1/(period/1000000.0);
-            RPM = Hz*60.0/poles;
+            if(period>1000){
+                lastTime = timeNow;
+                Hz = 1/(period/1000000.0);
+                RPM = Hz*60.0/poles; 
+            }
         }
 
         //checks for 0 rpm 

@@ -13,16 +13,7 @@ class tempSensor{
         return Tmp; 
     }
 
-    float calculateAvgTemp(float TempActual,uint8_t n){
-        if((TempActual>((tmp8/n)+3))||(TempActual<((tmp8/n)-3))){
-            tmp8=TempActual*n;
-        }else{
-            tmp8 += TempActual;
-            TempActual = tmp8 / (n+1);
-            tmp8 -= TempActual;
-        }
-        return TempActual;
-    }
+
 
     float GetResistance(){
         int RawADC = analogRead(adcPin);
@@ -58,9 +49,20 @@ class tempSensor{
     } 
 
 
-
     int GetADC(void){
         return analogRead(adcPin);
+    }
+
+    //returns avg temperature
+    float calculateAvgTemp(float TempActual,uint8_t n){
+        if((TempActual>((tmp8/n)+3))||(TempActual<((tmp8/n)-3))){
+            tmp8=TempActual*n;
+        }else{
+            tmp8 += TempActual;
+            TempActual = tmp8 / (n+1);
+            tmp8 -= TempActual;
+        }
+        return TempActual;
     }
 
 };

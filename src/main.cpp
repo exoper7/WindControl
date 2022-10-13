@@ -55,7 +55,8 @@ uint loop_n = 0;
 //instances for Temperature sensors
 tempSensor T1;
 tempSensor T2;
-float MCUtemp;
+tempSensor MCUtemp;
+
 
 //instance for Voltage mesurment
 voltage V0;
@@ -116,6 +117,8 @@ void setup() {
   T2.adcPin = A1;
   V0.adcPin = A0;
 
+  V0.setOffset();
+
   //Attach interrupt for rpm mesurment
   attachInterrupt(RPMpin,RPMcallback,RISING);
 
@@ -160,7 +163,7 @@ void preperData(void){
   _resp["temps"]["T2"]["T"] = T2.avgTemp;
   _resp["temps"]["T1"]["R"] = T1.Resistance;
   _resp["temps"]["T2"]["R"] = T2.Resistance;
-  _resp["temps"]["MCU"] = MCUtemp;
+  _resp["temps"]["MCU"] = MCUtemp.avgTemp;
   _resp["fanPower"] = fan.Speed;
   _resp["uptime"] = millis()/1000.000;
   _resp["relay"]["K1"] = control.K1;
@@ -169,6 +172,7 @@ void preperData(void){
   _resp["timeFromLastChange"] = control.millisFromLastChange / 1000.00;
   _resp["alarm"] = control.Alarm;
   _resp["alarmCode"] = control.AlarmCode;
+  _resp["volt_offset"] = V0.offset;
 }
 
 //Process HTTP Get request to API
@@ -256,7 +260,7 @@ void processGetRequest(void){
 
 
 void loop() {
-  //Call once inside loop() - all magic here
+  //modbusTCP task
   mb.task();
 
   //API handler
@@ -275,7 +279,7 @@ void loop() {
 
   //relays
   control.process(V0.U,T1.avgTemp,T2.avgTemp);
-  //delay(1);
+
   digitalWrite(K1pin,control.K1);
   digitalWrite(K2pin,control.K2);
   digitalWrite(K3pin,control.K3);
@@ -288,7 +292,7 @@ void loop() {
     //get temperature readings
     HregFloat(mr_T1,T1.GetAvgTemp());
     HregFloat(mr_T2,T2.GetAvgTemp());
-    MCUtemp = analogReadTemp();
+    MCUtemp.avgTemp = MCUtemp.calculateAvgTemp(analogReadTemp(),8);
 
     //fan.Speeede(T1.avgTemp,T2.avgTemp);
     analogWrite(FanPin,fan.getPwmSpeed());
