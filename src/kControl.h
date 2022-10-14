@@ -95,7 +95,7 @@ class kControl{
                         advance();
                     }
                 }
-            }else if(Voltage < 25.0){
+            }else if(Voltage < 15.0){
                 if(!minLoad){
                     if(readyForChange(30000)){
                         reduce();

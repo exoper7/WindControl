@@ -33,7 +33,7 @@ class voltage{
         float Ro = 10000.0;
         float Rt = 300000.0;
         float R1 = 10.0;
-        float R2 = 10.0;
+        float R2 = 100.0;
 
         float U=0;
         float I=0;
@@ -44,7 +44,8 @@ class voltage{
             float R;
             if(_R1){
                 if(_R2){
-                    R = R1 + R2;
+                    //R = R1 + R2;
+                    R = 2000;
                 }else{
                     R=R2;
                 }
