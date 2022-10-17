@@ -32,8 +32,8 @@ class voltage{
         float adcMax = 4096.00;
         float Ro = 10000.0;
         float Rt = 300000.0;
-        float R1 = 10.0;
-        float R2 = 100.0;
+        float R1 = 84.0;
+        float R2 = 490.0;
 
         float U=0;
         float I=0;
@@ -45,7 +45,7 @@ class voltage{
             if(_R1){
                 if(_R2){
                     //R = R1 + R2;
-                    R = 2000;
+                    R = 1940;
                 }else{
                     R=R2;
                 }
