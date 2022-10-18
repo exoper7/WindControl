@@ -21,7 +21,7 @@ ModbusIP mb;
 #define mr_current 12
 #define mr_rpm 14
 #define mr_power 16
-#define mr_T1 18
+#define mr_T1 1
 #define mr_T2 20
 #define mr_uptime 22
 
@@ -157,7 +157,9 @@ void preperData(void){
   _resp["voltage"] = V0.U;
   _resp["speed"]["rpm"] = _rpm.RPM;
   _resp["speed"]["f"] = _rpm.Hz;
+  _resp["speed"]["mean_f"] = _rpm.meanHz;
   _resp["power"] = V0.P;
+  _resp["estimate_power"] = V0.P * 10.0;
   _resp["currnet"] = V0.I;
   _resp["temps"]["T1"]["T"] = T1.avgTemp;
   _resp["temps"]["T2"]["T"] = T2.avgTemp;
@@ -169,6 +171,7 @@ void preperData(void){
   _resp["relay"]["K1"] = control.K1;
   _resp["relay"]["K2"] = control.K2;
   _resp["relay"]["K3"] = control.K3;
+  _resp["relay"]["currState"] = control.currState;
   _resp["timeFromLastChange"] = control.millisFromLastChange / 1000.00;
   _resp["alarm"] = control.Alarm;
   _resp["alarmCode"] = control.AlarmCode;
@@ -275,7 +278,7 @@ void loop() {
   delay(10);
 
   //mesure voltage 
-  V0.process(control.K2, control.K3);
+  V0.process(control.currState);
 
   //relays
   control.process(V0.U,T1.avgTemp,T2.avgTemp);

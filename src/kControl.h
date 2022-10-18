@@ -19,13 +19,16 @@ class kControl{
             }
             if(K1 && K2){
                 K3 = true;
+                currState = 3;
                 return;
             }
             if(K1){
                 K2 = true;
+                currState = 2;
             }else{
                 K1 = true;
                 maxLoad = false;
+                currState = 1;
             }
         }
 
@@ -39,12 +42,15 @@ class kControl{
             if(K1 && K2 && K3){
                 K3 = false;
                 minLoad = false;
+                currState = 2;
                 return;
             }
             if(K1 && K2){
                 K2 = false;
+                currState = 1;
             }else{
                 K1 = false;
+                currState = 0;
             }
         }
 
@@ -64,6 +70,7 @@ class kControl{
         u8_t AlarmCode;
         unsigned long millisFromLastChange;
         bool OverTemperature;
+        u8_t currState = 0;
 
         void process(float Voltage, float T1, float T2){
             if((T1>90.0)||(T2>90.0)){
