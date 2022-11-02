@@ -3,6 +3,7 @@
 class voltage{
     private:
         float tmp8=0;
+        float power8 = 0;
         
         //read adc and calculate voltage
         float getVoltage(void){
@@ -17,15 +18,15 @@ class voltage{
 
         //returns mean voltage from n samples 
         float calculateAvgVolt(float voltActual,uint8_t n){
-        if((voltActual>((tmp8/n)+10))||(voltActual<((tmp8/n)-10))){
-            tmp8=voltActual*n;
-        }else{
-            tmp8 += voltActual;
-            voltActual = tmp8 / (n+1);
-            tmp8 -= voltActual;
+            if((voltActual>((tmp8/n)+10))||(voltActual<((tmp8/n)-10))){
+                tmp8=voltActual*n;
+            }else{
+                tmp8 += voltActual;
+                voltActual = tmp8 / (n+1);
+                tmp8 -= voltActual;
+            }
+            return voltActual;
         }
-        return voltActual;
-    }
 
     public:
         u16_t offset = 0;
@@ -40,10 +41,20 @@ class voltage{
         float U=0;
         float I=0;
         float P=0;
+        float Pavg=0;
+        float E = 0;
 
         //read voltage and calculate current and power based on state
         void process(u8_t state){
+            
             U = calculateAvgVolt(getVoltage(),32);
+            
+            if(U < 0.1){
+                U = 0.0;
+                P = 0.0;
+                I = 0.0;
+                return;
+            }
 
             if(state == 0){
                 I = 0.0;
@@ -53,6 +64,12 @@ class voltage{
 
             I = U / Rvalue[state];;
             P = U * I;
+        }
+
+        void calculateAvgPower(){
+            power8 += P;
+            Pavg = power8 / 51.0;
+            power8 -= Pavg;
         }
 
         //auto set adc offset

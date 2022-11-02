@@ -8,6 +8,7 @@
 #include <kControl.h>
 #include <RPMs.h>
 #include <fanControl.h>
+#include <energy.h>
 
 //#define APIdebug true
 
@@ -74,6 +75,8 @@ void RPMcallback(void){
 
 fanControl fan;
 
+energy E0;
+
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -119,6 +122,9 @@ void setup() {
 
   V0.setOffset();
 
+  E0.begin();
+
+
   //Attach interrupt for rpm mesurment
   attachInterrupt(RPMpin,RPMcallback,RISING);
 
@@ -161,6 +167,7 @@ void preperData(void){
   _resp["power"] = V0.P;
   _resp["estimate_power"] = V0.P * 10.0;
   _resp["currnet"] = V0.I;
+  _resp["energy"] = E0.E;
   _resp["temps"]["T1"]["T"] = T1.avgTemp;
   _resp["temps"]["T2"]["T"] = T2.avgTemp;
   _resp["temps"]["T1"]["R"] = T1.Resistance;
@@ -279,6 +286,7 @@ void loop() {
 
   //mesure voltage 
   V0.process(control.currState);
+  V0.calculateAvgPower();
 
   //relays
   control.process(V0.U,T1.avgTemp,T2.avgTemp);
@@ -302,6 +310,7 @@ void loop() {
 
     // zero rpm handler
     _rpm.update();
+    E0.calculateEnergy(V0.Pavg);
   }else{
     loop_n++;
   }
