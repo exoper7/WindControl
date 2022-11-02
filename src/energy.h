@@ -14,6 +14,16 @@ class energy{
 
         u64_t lastWrite = 0;
 
+        void writeEnergy(float Enow){
+            ve.asFloat = E;
+            EEPROM.write(0,ve.asByte[0]);
+            EEPROM.write(1,ve.asByte[1]);
+            EEPROM.write(2,ve.asByte[2]);
+            EEPROM.write(3,ve.asByte[3]);
+
+            EEPROM.commit();
+        }
+
     public:
 
     //energy in Wh
@@ -28,6 +38,11 @@ class energy{
         ve.asByte[2] = EEPROM.read(2);
         ve.asByte[3] = EEPROM.read(3);
         //set data from eeprom to energy value.
+       
+        if(isnan(ve.asFloat)){
+            writeEnergy(0.0);
+            return;
+        }
         E = ve.asFloat;
     }
 
@@ -35,13 +50,7 @@ class energy{
     void calculateEnergy(float Pavg){
         E = E + Pavg / 7200.00;
         if((millis() - lastWrite) > (write_interval * 1000) ){
-            ve.asFloat = E;
-            EEPROM.write(0,ve.asByte[0]);
-            EEPROM.write(1,ve.asByte[1]);
-            EEPROM.write(2,ve.asByte[2]);
-            EEPROM.write(3,ve.asByte[3]);
-
-            EEPROM.commit();
+            writeEnergy(E);
             lastWrite = millis();
         }
     }
