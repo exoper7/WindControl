@@ -27,7 +27,7 @@ class energy{
     public:
 
     //energy in Wh
-    float E = 0.0; 
+    float E = 48.0; 
 
     //init eeprom and energy metering
     void begin(){

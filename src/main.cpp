@@ -1,5 +1,5 @@
 #include <WiFi.h>
-#include <ModbusIP_ESP8266.h>
+//#include <ModbusIP_ESP8266.h>
 #include <ArduinoJson.h>
 
 
@@ -16,7 +16,7 @@
 
 
 //ModbusIP object
-ModbusIP mb;
+//ModbusIP mb;
 //define modbus registers
 #define mr_voltage 10
 #define mr_current 12
@@ -109,8 +109,8 @@ void setup() {
   Serial.println(WiFi.localIP());
   
   //Config Modbus IP
-  mb.server();
-  mb.addHreg(10,0,20);
+  //mb.server();
+  //mb.addHreg(10,0,20);
 
   //start API server
   server.begin();
@@ -137,6 +137,7 @@ void setup() {
   //digitalWrite(D8_LED, HIGH);
 }
 
+/*
 //Splits float value to 2 modbus registers
 void HregFloat(uint16_t _reg, float _val){
 
@@ -151,6 +152,7 @@ void HregFloat(uint16_t _reg, float _val){
   mb.Hreg(_reg+1,v.asInt[1]);
 
 }
+*/
 
 String SetFanSpeed(String _strData){
   String _strSpeed = _strData.substring(8);
@@ -271,11 +273,12 @@ void processGetRequest(void){
 
 void loop() {
   //modbusTCP task
-  mb.task();
+  //mb.task();
 
   //API handler
   processGetRequest();
 
+  /*
   //modbus values here
   HregFloat(mr_voltage,V0.U);
   HregFloat(mr_current,V0.I);
@@ -283,7 +286,7 @@ void loop() {
   HregFloat(mr_power,V0.P);
   HregFloat(mr_uptime,millis()/1000.000);
   delay(10);
-
+  */
   //mesure voltage 
   V0.process(control.currState);
   V0.calculateAvgPower();
@@ -299,12 +302,14 @@ void loop() {
   //trigger every 500ms
   if(loop_n>50){
     loop_n = 0;
-
+    /*
     //get temperature readings
     HregFloat(mr_T1,T1.GetAvgTemp());
     HregFloat(mr_T2,T2.GetAvgTemp());
+    */
+    T1.GetAvgTemp();
+    T2.GetAvgTemp();
     MCUtemp.avgTemp = MCUtemp.calculateAvgTemp(analogReadTemp(),8);
-
     //fan.Speeede(T1.avgTemp,T2.avgTemp);
     analogWrite(FanPin,fan.getPwmSpeed());
 

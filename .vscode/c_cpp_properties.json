@@ -10,6 +10,7 @@
             "includePath": [
                 "c:/APA/source/vscode/WindControl/WindControl/include",
                 "c:/APA/source/vscode/WindControl/WindControl/src",
+                "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/EEPROM/src",
                 "c:/APA/source/vscode/WindControl/WindControl/.pio/libdeps/development/ArduinoJson/src",
                 "c:/APA/source/vscode/WindControl/WindControl/.pio/libdeps/development/modbus-esp8266/src",
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/lwIP_CYW43/src",
@@ -27,7 +28,6 @@
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/variants/rpipicow",
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/ArduinoOTA/src",
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/DNSServer/src",
-                "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/EEPROM/src",
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/ESP8266SdFat/src",
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/FreeRTOS/src",
                 "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/HTTPClient/src",
@@ -53,6 +53,7 @@
                 "path": [
                     "c:/APA/source/vscode/WindControl/WindControl/include",
                     "c:/APA/source/vscode/WindControl/WindControl/src",
+                    "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/EEPROM/src",
                     "c:/APA/source/vscode/WindControl/WindControl/.pio/libdeps/development/ArduinoJson/src",
                     "c:/APA/source/vscode/WindControl/WindControl/.pio/libdeps/development/modbus-esp8266/src",
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/lwIP_CYW43/src",
@@ -70,7 +71,6 @@
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/variants/rpipicow",
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/ArduinoOTA/src",
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/DNSServer/src",
-                    "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/EEPROM/src",
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/ESP8266SdFat/src",
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/FreeRTOS/src",
                     "C:/Users/GA/.platformio/packages/framework-arduinopico/libraries/HTTPClient/src",
