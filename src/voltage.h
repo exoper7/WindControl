@@ -74,6 +74,7 @@ class voltage{
 
         //auto set adc offset
         void setOffset(){
+            analogReadResolution(12);
             u32_t offsetSum=0;
             for(u8_t loop = 0;loop < 10; loop++){
                 offsetSum = offsetSum + analogRead(adcPin);
