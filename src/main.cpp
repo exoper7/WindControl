@@ -49,7 +49,7 @@ IPAddress subnet(255, 255, 0, 0);
 IPAddress primaryDNS(1, 1, 1, 1);
 
 //JSON file for API
-DynamicJsonDocument _resp(512);
+DynamicJsonDocument _resp(1024);
 
 uint loop_n = 0;
 
@@ -167,6 +167,7 @@ void preperData(void){
   _resp["speed"]["f"] = _rpm.Hz;
   _resp["speed"]["mean_f"] = _rpm.meanHz;
   _resp["power"] = V0.P;
+  _resp["power_avg"] = V0.Pavg;
   _resp["estimate_power"] = V0.P * 10.0;
   _resp["currnet"] = V0.I;
   _resp["energy"] = E0.E;
@@ -193,6 +194,7 @@ void processGetRequest(void){
 
   if (client)
   {
+
 
     #ifdef APIdebug
       Serial.println(("\n\n##################################\nNew client"));
@@ -231,7 +233,7 @@ void processGetRequest(void){
             "\r\n");
 
           if(_GetRequest.equals("/")){
-            client.print(("hello"));
+            client.print(("hello, I am a Wind turbine controller more info at myip/status"));
           }else if(_GetRequest.equals("/status")){ 
             preperData();
             serializeJson(_resp,client);
@@ -262,6 +264,7 @@ void processGetRequest(void){
 
     // close the connection:
     client.stop();
+
 
     #ifdef APIdebug
      Serial.println(F("Client disconnected"));
