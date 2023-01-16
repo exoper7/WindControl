@@ -48,7 +48,8 @@ class energy{
 
     //calculate energy based on avg power, call this every 500ms
     void calculateEnergy(float Pavg){
-        E = E + Pavg / 7200.00;
+        E = E + (Pavg / 7200.00);
+        
         if((millis() - lastWrite) > (write_interval * 1000) ){
             writeEnergy(E);
             lastWrite = millis();

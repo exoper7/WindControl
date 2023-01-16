@@ -51,7 +51,9 @@ IPAddress primaryDNS(1, 1, 1, 1);
 //JSON file for API
 DynamicJsonDocument _resp(1024);
 
-uint loop_n = 0;
+//uint loop_n = 0;
+
+u64_t lastSubLoop = 0;
 
 //instances for Temperature sensors
 tempSensor T1;
@@ -194,8 +196,6 @@ void processGetRequest(void){
 
   if (client)
   {
-
-
     #ifdef APIdebug
       Serial.println(("\n\n##################################\nNew client"));
     #endif
@@ -301,10 +301,11 @@ void loop() {
   digitalWrite(K2pin,control.K2);
   digitalWrite(K3pin,control.K3);
   digitalWrite(AlarmLED,control.Alarm);
+  delay(10);
   
   //trigger every 500ms
-  if(loop_n>50){
-    loop_n = 0;
+  if(millis()>(lastSubLoop+500)){
+    lastSubLoop = millis();
     /*
     //get temperature readings
     HregFloat(mr_T1,T1.GetAvgTemp());
@@ -319,8 +320,5 @@ void loop() {
     // zero rpm handler
     _rpm.update();
     E0.calculateEnergy(V0.Pavg);
-  }else{
-    loop_n++;
   }
-  
 }
