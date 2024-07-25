@@ -94,7 +94,9 @@ SECTIONS
         /* bit of a hack right now to exclude all floating point and time critical (e.g. memset, memcpy) code from
          * FLASH ... we will include any thing excluded here in .data below by default */
         *(.init)
-        *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .text*)
+        /* Some of these excludes required for PicoDVI library, won't affect most code */
+        *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a: *interp.c.obj *divider.S.obj *PicoDVI.cpp.o *dvi.c.o) .text*)
+
         *(.fini)
         /* Pull all c'tors into .text */
         *crtbegin.o(.ctors)
@@ -191,11 +193,6 @@ SECTIONS
         __data_end__ = .;
     } > RAM AT> FLASH
 
-    .uninitialized_data (COPY): {
-        . = ALIGN(4);
-        *(.uninitialized_data*)
-    } > RAM
-
     /* Start and end symbols must be word-aligned */
     .scratch_x : {
         __scratch_x_start__ = .;
@@ -213,13 +210,22 @@ SECTIONS
     } > SCRATCH_Y AT > FLASH
     __scratch_y_source__ = LOADADDR(.scratch_y);
 
-    .bss  : {
+    .bss : {
         . = ALIGN(4);
         __bss_start__ = .;
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
         *(COMMON)
         . = ALIGN(4);
         __bss_end__ = .;
+    } > RAM
+
+    /* At most one of the following two will be engaged, depending on the SDK version */
+    .uninitialized_ram MAX(0x20003000, .) (NOLOAD) : {
+        *(.uninitialized_ram*)
+    } > RAM
+
+    .uninitialized_data MAX(0x20003000, .) (NOLOAD) : {
+        *(.uninitialized_data*)
     } > RAM
 
     .heap (COPY):

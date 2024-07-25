@@ -36,7 +36,7 @@ class voltage{
         float Ro = 10000.0;
         float Rt = 300000.0;
         //resistance values for active state
-        float Rvalue[4] = {0,84.0,490.0,1940.0};
+        float Rvalue[4] = {84.0,490.0,980.0,1940.0};
 
         float U=0;
         float I=0;

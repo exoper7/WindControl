@@ -40,12 +40,12 @@ WiFiServer server(80);
 // Set your Static IP address
 
 #ifdef MasterNode
-  IPAddress local_IP(10, 217, 60, 120);
+  IPAddress local_IP(10, 200, 0, 190);
 #else
-  IPAddress local_IP(10, 217, 60, 121);
+  IPAddress local_IP(10, 200, 0, 191);
 #endif
-IPAddress gateway(10, 217, 0, 10);
-IPAddress subnet(255, 255, 0, 0);
+IPAddress gateway(10, 200, 0, 1);
+IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(1, 1, 1, 1);
 
 //JSON file for API
@@ -103,7 +103,7 @@ void setup() {
   // Configures static IP address
   WiFi.config(local_IP, primaryDNS, gateway, subnet);
 
-  WiFi.begin("APA_GROUP", "apa$$wifi");
+  WiFi.begin("APA_TEST", "#$Test$#12");
   while (WiFi.status() != WL_CONNECTED) {
     delay(150);
   }

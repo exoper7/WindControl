@@ -91,7 +91,7 @@ class kControl{
                 }
             }
 
-            if(Voltage > 55.0){
+            if(Voltage > 35.0){
                 if(maxLoad){
                     Alarm = true;
                     AlarmCode = overVolt;
@@ -102,7 +102,7 @@ class kControl{
                         advance();
                     }
                 }
-            }else if(Voltage < 35.0){
+            }else if(Voltage < 25.0){
                 if(!minLoad){
                     if(readyForChange(30000)){
                         reduce();
