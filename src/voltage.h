@@ -56,11 +56,6 @@ class voltage{
                 return;
             }
 
-            if(state == 0){
-                I = 0.0;
-                P = 0.0;
-                return;
-            }
 
             I = U / Rvalue[state];;
             P = U * I;
